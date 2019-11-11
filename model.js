@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise;
 let beerSchema = mongoose.Schema({
     name : { type : String },
     barcode : { type : String },
-    unit_price : { type : Int },
+    unit_price : { type : Number },
 	provider : { type: mongoose.Schema.Types.ObjectId,
 		ref: 'Provider' }
 });
@@ -35,7 +35,7 @@ let BeerList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Beer.findOne({id: id})
+		return Beer.findOne({id_: id})
 					.then(beer=> {
 						return beer;
 					})
@@ -44,7 +44,7 @@ let BeerList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Beer.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return Beer.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(beer=> {
 						return beer;
 					})
@@ -53,7 +53,7 @@ let BeerList = {
 					});
 	},
 	delete: function(id) {
-		return Beer.findOneAndRemove({id: id})
+		return Beer.findOneAndRemove({id_: id})
 					.then(beer => {
 						return beer;
 					})
@@ -69,7 +69,7 @@ let ticketSchema = mongoose.Schema({
 		ref: 'User' },
     beer : { type: mongoose.Schema.Types.ObjectId,
 		ref: 'Beer' },
-    total : { type : Double },
+    total : { type : Number },
 	payment_method : { type: mongoose.Schema.Types.ObjectId,
 		ref: 'PaymentMethod' }
 });
@@ -97,7 +97,7 @@ let TicketList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Ticket.findOne({id: id})
+		return Ticket.findOne({id_: id})
 					.then(ticket=> {
 						return ticket;
 					})
@@ -106,7 +106,7 @@ let TicketList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Ticket.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return Ticket.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(ticket=> {
 						return ticket;
 					})
@@ -115,7 +115,7 @@ let TicketList = {
 					});
 	},
 	delete: function(id) {
-		return Ticket.findOneAndRemove({id: id})
+		return Ticket.findOneAndRemove({id_: id})
 					.then(ticket => {
 						return ticket;
 					})
@@ -129,7 +129,7 @@ let TicketList = {
 let reviewSchema = mongoose.Schema({
     user : { type: mongoose.Schema.Types.ObjectId,
 		ref: 'User' },
-    rating : { type : Int },
+    rating : { type : Number },
 	comment: { type : String }
 });
 
@@ -156,7 +156,7 @@ let ReviewList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Review.findOne({id: id})
+		return Review.findOne({id_: id})
 					.then(review=> {
 						return review;
 					})
@@ -165,7 +165,7 @@ let ReviewList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Review.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return Review.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(review=> {
 						return review;
 					})
@@ -174,7 +174,7 @@ let ReviewList = {
 					});
 	},
 	delete: function(id) {
-		return Review.findOneAndRemove({id: id})
+		return Review.findOneAndRemove({id_: id})
 					.then(review => {
 						return review;
 					})
@@ -213,7 +213,7 @@ let ProviderList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Provider.findOne({id: id})
+		return Provider.findOne({id_: id})
 					.then(provider=> {
 						return provider;
 					})
@@ -222,7 +222,7 @@ let ProviderList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Provider.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return Provider.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(provider=> {
 						return provider;
 					})
@@ -231,7 +231,7 @@ let ProviderList = {
 					});
 	},
 	delete: function(id) {
-		return Provider.findOneAndRemove({id: id})
+		return Provider.findOneAndRemove({id_: id})
 					.then(provider => {
 						return provider;
 					})
@@ -270,7 +270,7 @@ let UserList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return User.findOne({id: id})
+		return User.findOne({id_: id})
 					.then(user=> {
 						return user;
 					})
@@ -279,7 +279,7 @@ let UserList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return User.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return User.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(user=> {
 						return user;
 					})
@@ -288,7 +288,7 @@ let UserList = {
 					});
 	},
 	delete: function(id) {
-		return User.findOneAndRemove({id: id})
+		return User.findOneAndRemove({id_: id})
 					.then(user => {
 						return user;
 					})
@@ -297,12 +297,6 @@ let UserList = {
 					});
 	}
 }
-    
-    PaymentMethod {
-        cardEnd: string (last 4 digits)
-        expirationMonth: string
-        expirationYear: string
-    }
 
 // Provider schema and API definition.
 let paymentMethodSchema = mongoose.Schema({
@@ -334,7 +328,7 @@ let PaymentMethodList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return PaymentMethod.findOne({id: id})
+		return PaymentMethod.findOne({id_: id})
 					.then(paymentMethod=> {
 						return paymentMethod;
 					})
@@ -343,7 +337,7 @@ let PaymentMethodList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return PaymentMethod.findOneAndUpdate({id: id}, {$set: newValue}, {new: true})
+		return PaymentMethod.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
 					.then(paymentMethod=> {
 						return paymentMethod;
 					})
@@ -352,7 +346,7 @@ let PaymentMethodList = {
 					});
 	},
 	delete: function(id) {
-		return PaymentMethod.findOneAndRemove({id: id})
+		return PaymentMethod.findOneAndRemove({id_: id})
 					.then(paymentMethod => {
 						return paymentMethod;
 					})
