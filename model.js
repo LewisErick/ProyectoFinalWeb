@@ -5,11 +5,14 @@ mongoose.Promise = global.Promise;
 
 // Beer SCHEMA and API definition.
 let beerSchema = mongoose.Schema({
-    name : { type : String },
-    barcode : { type : String },
-    unit_price : { type : Number },
-	provider : { type: mongoose.Schema.Types.ObjectId,
-		ref: 'Provider' }
+    nombre : { type : String },
+    cerveceria : { type : String },
+	IBU : { type : Number },
+	ABV : { type : Number },
+	SRM : { type : Number },
+	estilo : { type : String },
+	origen : { type : String },
+	fotoURL : { type : String },
 });
 
 let Beer = mongoose.model( 'Beer', beerSchema );
@@ -43,8 +46,8 @@ let BeerList = {
 						throw Error(error);
 					});
 	},
-	put: function( id, newValue ) {
-		return Beer.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+	get_by_name: function( name ) {
+		return Beer.findOne({nombre: name})
 					.then(beer=> {
 						return beer;
 					})
@@ -52,8 +55,17 @@ let BeerList = {
 						throw Error(error);
 					});
 	},
-	delete: function(id) {
-		return Beer.findOneAndRemove({id_: id})
+	put: function( name, newValue ) {
+		return Beer.findOneAndUpdate({nombre: name}, {$set: newValue}, {new: true})
+					.then(beer=> {
+						return beer;
+					})
+					.catch( error => {
+						throw Error(error);
+					});
+	},
+	delete: function(name) {
+		return Beer.findOneAndRemove({nombre: name})
 					.then(beer => {
 						return beer;
 					})
@@ -241,7 +253,7 @@ let ProviderList = {
 	}
 }
 
-// Provider schema and API definition.
+// User schema and API definition.
 let userSchema = mongoose.Schema({
     email: { type : String },
     password: { type : String },
@@ -298,7 +310,7 @@ let UserList = {
 	}
 }
 
-// Provider schema and API definition.
+// Payment method schema and API definition.
 let paymentMethodSchema = mongoose.Schema({
     card_last_digits: { type : String },
     expiration_month: { type : String },
