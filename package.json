@@ -1,0 +1,28 @@
+{
+  "name": "proyectofinalweb",
+  "version": "1.0.0",
+  "description": "Web Final Project",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.9",
+    "morgan": "^1.9.1",
+    "uuidv4": "^5.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LewisErick/ProyectoFinalWeb.git"
+  },
+  "author": "Diego Martinez y Luis Zul",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LewisErick/ProyectoFinalWeb/issues"
+  },
+  "homepage": "https://github.com/LewisErick/ProyectoFinalWeb#readme"
+}
