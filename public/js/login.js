@@ -1,7 +1,17 @@
 function login(email, password) {
-    let url = "/api/users/" + email;
+    let url = "/api/users/login";
 
-    fetch(url)
+    data = {
+        "email" : email,
+        "password" : password
+    };
+
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers:{
+          'Content-Type': 'application/json'
+        }})
         .then(res => {
             if(res.ok) {
                 return res.json();
@@ -9,16 +19,12 @@ function login(email, password) {
             throw new Error(res.statusText);
         })
         .then(resJSON => {
-            if(resJSON.password == password) {
-                window.location.replace("/shop.html");
-            } else {
-                $("#error").text("Error: Incorrect email or password");
-                $("#error").css("visibility", "visible");
-            }
-
+            window.location.replace("/shop.html");
             console.log(resJSON);
         }) 
         .catch(err => {
+            $("#error").text("Error: Incorrect email or password");
+            $("#error").css("visibility", "visible");
             console.log(err);
         });
 }

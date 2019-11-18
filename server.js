@@ -410,8 +410,8 @@ app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
 		});
 });
 
-app.get( "/api/users/:email", ( req, res, next ) => {
-	let email = req.params.email;
+app.post( "/api/users/login", bodyParser, ( req, res, next ) => {
+	let email = req.body.email;
 
 	if ( !email ){
 		res.statusMessage = "Missing 'email' field in params!";
@@ -423,6 +423,9 @@ app.get( "/api/users/:email", ( req, res, next ) => {
 
 	UserList.get_by_email(email)
 		.then( user => {
+			if (req.body.password != user.password) {
+				return res.status(401).json("Incorrect password.");
+			}
 			return res.status( 200 ).json( user );
 		})
 		.catch( error => {
