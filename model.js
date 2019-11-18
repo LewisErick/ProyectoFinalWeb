@@ -38,7 +38,7 @@ let BeerList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Beer.findOne({id_: id})
+		return Beer.findOne({_id: id})
 					.then(beer=> {
 						return beer;
 					})
@@ -109,7 +109,7 @@ let TicketList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Ticket.findOne({id_: id})
+		return Ticket.findOne({_id: id})
 					.then(ticket=> {
 						return ticket;
 					})
@@ -118,7 +118,7 @@ let TicketList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Ticket.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return Ticket.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(ticket=> {
 						return ticket;
 					})
@@ -127,7 +127,7 @@ let TicketList = {
 					});
 	},
 	delete: function(id) {
-		return Ticket.findOneAndRemove({id_: id})
+		return Ticket.findOneAndRemove({_id: id})
 					.then(ticket => {
 						return ticket;
 					})
@@ -168,7 +168,7 @@ let ReviewList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Review.findOne({id_: id})
+		return Review.findOne({_id: id})
 					.then(review=> {
 						return review;
 					})
@@ -177,7 +177,7 @@ let ReviewList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Review.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return Review.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(review=> {
 						return review;
 					})
@@ -186,7 +186,7 @@ let ReviewList = {
 					});
 	},
 	delete: function(id) {
-		return Review.findOneAndRemove({id_: id})
+		return Review.findOneAndRemove({_id: id})
 					.then(review => {
 						return review;
 					})
@@ -225,7 +225,7 @@ let ProviderList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return Provider.findOne({id_: id})
+		return Provider.findOne({_id: id})
 					.then(provider=> {
 						return provider;
 					})
@@ -234,7 +234,7 @@ let ProviderList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return Provider.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return Provider.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(provider=> {
 						return provider;
 					})
@@ -243,7 +243,7 @@ let ProviderList = {
 					});
 	},
 	delete: function(id) {
-		return Provider.findOneAndRemove({id_: id})
+		return Provider.findOneAndRemove({_id: id})
 					.then(provider => {
 						return provider;
 					})
@@ -284,7 +284,7 @@ let UserList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return User.findOne({id_: id})
+		return User.findOne({_id: id})
 					.then(user=> {
 						return user;
 					})
@@ -302,7 +302,7 @@ let UserList = {
 				});
 	},
 	put: function( id, newValue ) {
-		return User.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return User.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(user=> {
 						return user;
 					})
@@ -311,7 +311,7 @@ let UserList = {
 					});
 	},
 	delete: function(id) {
-		return User.findOneAndRemove({id_: id})
+		return User.findOneAndRemove({_id: id})
 					.then(user => {
 						return user;
 					})
@@ -351,7 +351,7 @@ let PaymentMethodList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return PaymentMethod.findOne({id_: id})
+		return PaymentMethod.findOne({_id: id})
 					.then(paymentMethod=> {
 						return paymentMethod;
 					})
@@ -360,7 +360,7 @@ let PaymentMethodList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return PaymentMethod.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return PaymentMethod.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(paymentMethod=> {
 						return paymentMethod;
 					})
@@ -369,7 +369,7 @@ let PaymentMethodList = {
 					});
 	},
 	delete: function(id) {
-		return PaymentMethod.findOneAndRemove({id_: id})
+		return PaymentMethod.findOneAndRemove({_id: id})
 					.then(paymentMethod => {
 						return paymentMethod;
 					})
@@ -415,7 +415,7 @@ let ShoppingCartList = {
 				});
 	},
 	get_by_id: function( id ) {
-		return ShoppingCart.findOne({id_: id})
+		return ShoppingCart.findOne({_id: id})
 					.then(shoppingCart=> {
 						return shoppingCart;
 					})
@@ -424,7 +424,7 @@ let ShoppingCartList = {
 					});
 	},
 	put: function( id, newValue ) {
-		return ShoppingCart.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+		return ShoppingCart.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
 					.then(shoppingCart=> {
 						return shoppingCart;
 					})
@@ -433,7 +433,7 @@ let ShoppingCartList = {
 					});
 	},
 	delete: function(id) {
-		return ShoppingCart.findOneAndRemove({id_: id})
+		return ShoppingCart.findOneAndRemove({_id: id})
 					.then(shoppingCart => {
 						return shoppingCart;
 					})

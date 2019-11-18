@@ -1,17 +1,14 @@
 void retrieveCart() {
+    var email;
     $.ajax({
-        url: url,
+        url: "/api/session",
         type: 'GET',
         success: function(responseJSON) {
-            var ht = "";
-
-            $.each(responseJSON, function(i, val) {
-                ht += `
-                    <li>${JSON.stringify(val)}</li>
-                `;
-            });
-
-            $("#postList").html(ht);
+            if (responseJSON.ok) {
+                email = responseJSON["email"];
+            } else {
+                throw new Error("Couldn't retrieve session. Running as user");
+            }
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(`${xhr.status}: ${thrownError}`);

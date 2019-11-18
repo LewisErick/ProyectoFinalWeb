@@ -4,14 +4,30 @@ let morgan = require( "morgan" );
 let mongoose = require( "mongoose" );
 let bodyParser = require( "body-parser" );
 let { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList } = require('./model');
+const {DATABASE_URL, PORT} = require('./config');
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 let app = express();
 let jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
 
 app.use( express.static( "public" ) );
-
 app.use( morgan( "dev" ) );
+
+mongoose.connect(DATABASE_URL, {
+    useMongoClient: true
+});
+mongoose.Promise = global.Promise;
+const db = mongoose.connection;
+
+app.use(session({
+    secret: 'my-secret',
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: db })
+}));
 
 app.get( "/api/beers", ( req, res, next ) => {
 	BeerList.get()
@@ -410,6 +426,24 @@ app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
 		});
 });
 
+app.get("/api/users/:id", ( req, res, next) => {
+	sess = req.session;
+
+	if (sess.email == req.params.id || sess.debug) {
+		UserList.get_by_id(sess.email)
+			.then( users => {
+				return res.status( 200 ).json( users );
+			})
+			.catch( error => {
+				res.statusMessage = "Something went wrong with the DB. Try again later.";
+				return res.status( 500 ).json({
+					status : 500,
+					message : "Something went wrong with the DB. Try again later."
+				})
+			});	
+	}
+});
+
 app.post( "/api/users/login", bodyParser, ( req, res, next ) => {
 	let email = req.body.email;
 
@@ -426,6 +460,10 @@ app.post( "/api/users/login", bodyParser, ( req, res, next ) => {
 			if (req.body.password != user.password) {
 				return res.status(401).json("Incorrect password.");
 			}
+
+			sess = req.session;
+			sess.email = user._id;
+
 			return res.status( 200 ).json( user );
 		})
 		.catch( error => {
@@ -683,6 +721,16 @@ app.delete( "/api/payments/:id", ( req, res, next ) => {
 		});
 });
 
+app.get("/api/session", (req, res, next) => {
+	sess = req.session;
+
+	if (sess.email) {
+		return res.status(200).json({
+			email: sess.email
+		});
+	}
+});
+
 let server;
 
 function runServer(port, databaseUrl){
@@ -722,7 +770,7 @@ function closeServer(){
 		});
 }
 
-runServer( 8080, "mongodb+srv://root:rootpass@sandbox-gxlks.mongodb.net/CervezologiaDB?retryWrites=true&w=majority" )
+runServer( PORT, DATABASE_URL)
 	.catch( err => {
 		console.log( err );
 	});
