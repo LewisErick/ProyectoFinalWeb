@@ -15,7 +15,7 @@ let beerSchema = mongoose.Schema({
 	fotoURL : { type : String },
 });
 
-let Beer = mongoose.model( 'Beer', beerSchema );
+let Beer = mongoose.model( 'Beer', beerSchema, 'beers' );
 let BeerList = {
 	get : function(){
 		return Beer.find()
@@ -261,7 +261,7 @@ let userSchema = mongoose.Schema({
 					ref: "ShoppingCart" }
 });
 
-let User = mongoose.model( 'User', userSchema );
+let User = mongoose.model( 'user', userSchema, 'user' );
 let UserList = {
 	get : function(){
 		return User.find()
@@ -291,6 +291,15 @@ let UserList = {
 					.catch( error => {
 						throw Error(error);
 					});
+	},
+	get_by_email: function(email) {
+		return User.findOne({email: email})
+				.then(user => {
+					return user;
+				})
+				.catch(err => {
+					throw Error(err);
+				});
 	},
 	put: function( id, newValue ) {
 		return User.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
