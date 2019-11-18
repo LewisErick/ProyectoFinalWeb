@@ -256,7 +256,9 @@ let ProviderList = {
 // User schema and API definition.
 let userSchema = mongoose.Schema({
     email: { type : String },
-    password: { type : String },
+	password: { type : String },
+	shoppingCart: { type: mongoose.Schema.Types.ObjectId,
+					ref: "ShoppingCart" }
 });
 
 let User = mongoose.model( 'User', userSchema );
@@ -368,4 +370,69 @@ let PaymentMethodList = {
 	}
 }
 
-module.exports = { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList };
+
+
+// Shopping cart schema and API definition.
+let shoppingCartSchema = mongoose.Schema({
+    entries: [{
+		quantity: Number,
+		beer: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Beer'
+		}
+	}]
+});
+
+let ShoppingCart = mongoose.model( 'ShoppingCart', shoppingCartSchema );
+let ShoppingCartList = {
+	get : function(){
+		return ShoppingCart.find()
+				.then( shoppingCarts => {
+					return shoppingCarts;
+				})
+				.catch( error => {
+					throw Error(error);
+				});
+	},
+	post : function( newUser ){
+		newUser.id = uuid()
+		return ShoppingCart.create(newUser)
+				.then(shoppingCart => {
+					return shoppingCart;
+				})
+				.catch( error => {
+					console.log(newUser, error);
+					throw Error(error);
+				});
+	},
+	get_by_id: function( id ) {
+		return ShoppingCart.findOne({id_: id})
+					.then(shoppingCart=> {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw Error(error);
+					});
+	},
+	put: function( id, newValue ) {
+		return ShoppingCart.findOneAndUpdate({id_: id}, {$set: newValue}, {new: true})
+					.then(shoppingCart=> {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw Error(error);
+					});
+	},
+	delete: function(id) {
+		return ShoppingCart.findOneAndRemove({id_: id})
+					.then(shoppingCart => {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw new Error(error);
+					});
+	}
+}
+
+
+module.exports = { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList, ShoppingCartList };
