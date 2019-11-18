@@ -410,18 +410,18 @@ app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
 		});
 });
 
-app.get( "/api/users/:id", ( req, res, next ) => {
-	let id = req.params.id;
+app.get( "/api/users/:email", ( req, res, next ) => {
+	let email = req.params.email;
 
-	if ( !id ){
-		res.statusMessage = "Missing 'id' field in params!";
+	if ( !email ){
+		res.statusMessage = "Missing 'email' field in params!";
 		return res.status( 406 ).json({
-			message : "Missing 'id' field in params!",
+			message : "Missing 'email' field in params!",
 			status : 406
 		});
 	}
 
-	UserList.get_by_id(id)
+	UserList.get_by_email(email)
 		.then( user => {
 			return res.status( 200 ).json( user );
 		})
@@ -719,7 +719,7 @@ function closeServer(){
 		});
 }
 
-runServer( 8080, "mongodb://localhost/beersDB" )
+runServer( 8080, "mongodb+srv://root:rootpass@sandbox-gxlks.mongodb.net/CervezologiaDB?retryWrites=true&w=majority" )
 	.catch( err => {
 		console.log( err );
 	});
