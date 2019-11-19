@@ -1,3 +1,35 @@
+function loadReviews(reviews) {
+    let len = reviews.length;
+    for(let i = 0; i < len; i++) {
+        let url = "/api/reviews/" + reviews[i];
+        fetch(url)
+            .then(res => {
+                if(res.ok) {
+                    return res.json();
+                }
+                throw new Error(res.statusText);
+            })
+            .then(resJSON => {
+                $("#beerReviews").append(
+                    `<li>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <blockquote class="blockquote">
+                                    <p class="mb-0">
+                                        ${resJSON.comment}
+                                    </p>
+                                    <p> Rating: ${resJSON.rating} </p>
+                                    <footer class="blockquote-footer">
+                                        ${resJSON.user}
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </li>`);
+            })
+    }
+}
+
 function loadDetail(beer) {
     let url = "/api/beers/" + beer;
     fetch(url)
@@ -8,6 +40,10 @@ function loadDetail(beer) {
             throw new Error(res.statusText);
         })
         .then(resJSON => {
+            if(resJSON.reviews) {
+                loadReviews(resJSON.reviews);
+            }
+
             $("#beerName").text(resJSON.Nombre);
             $("#beerDetailImg").attr({"src": resJSON.fotoURL, "height":200, "width":160});
             $("#style").html(`<b>Style: </b> ${resJSON.Estilo}`);

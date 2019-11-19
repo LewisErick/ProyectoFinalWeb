@@ -13,6 +13,8 @@ let beerSchema = mongoose.Schema({
 	Estilo : { type : String },
 	Origen : { type : String },
 	fotoURL : { type : String },
+	review : { type: mongoose.Schema.Types.ObjectId,
+		ref: 'Review' },
 });
 
 let Beer = mongoose.model( 'Beer', beerSchema, 'beers' );
@@ -139,13 +141,12 @@ let TicketList = {
 
 // Review and API definition.
 let reviewSchema = mongoose.Schema({
-    user : { type: mongoose.Schema.Types.ObjectId,
-		ref: 'User' },
+    user : { type: String },
     rating : { type : Number },
 	comment: { type : String }
 });
 
-let Review = mongoose.model( 'Review', reviewSchema );
+let Review = mongoose.model( 'Review', reviewSchema, 'reviews' );
 let ReviewList = {
 	get : function(){
 		return Review.find()
@@ -261,7 +262,7 @@ let userSchema = mongoose.Schema({
 					ref: "ShoppingCart" }
 });
 
-let User = mongoose.model( 'user', userSchema, 'user' );
+let User = mongoose.model( 'User', userSchema, 'user' );
 let UserList = {
 	get : function(){
 		return User.find()
