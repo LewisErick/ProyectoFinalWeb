@@ -13,7 +13,7 @@ let beerSchema = mongoose.Schema({
 	Estilo : { type : String },
 	Origen : { type : String },
 	fotoURL : { type : String },
-	review : { type: mongoose.Schema.Types.ObjectId,
+	reviews : { type: [mongoose.Schema.Types.ObjectId],
 		ref: 'Review' },
 });
 
@@ -58,12 +58,21 @@ let BeerList = {
 					});
 	},
 	put: function( name, newValue ) {
-		return Beer.findOneAndUpdate({Nombre: name}, {$set: newValue}, {new: true})
+		return Beer.findOneAndUpdate({ Nombre: name }, {$set: newValue}, {new: true})
 					.then(beer=> {
 						return beer;
 					})
 					.catch( error => {
 						throw Error(error);
+					});
+	},
+	addReview: function( name, review ) {
+		return Beer.findOneAndUpdate({ Nombre : name }, { $push: { reviews: review } } )
+					.then(beer => {
+						return beer;
+					})
+					.catch(err => {
+						throw Error(err);
 					});
 	},
 	delete: function(name) {
@@ -146,7 +155,7 @@ let reviewSchema = mongoose.Schema({
 	comment: { type : String }
 });
 
-let Review = mongoose.model( 'Review', reviewSchema, 'reviews' );
+let Review = mongoose.model( 'Review', reviewSchema, 'userReviews' );
 let ReviewList = {
 	get : function(){
 		return Review.find()

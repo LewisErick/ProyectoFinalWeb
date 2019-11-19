@@ -62,23 +62,23 @@ app.post( "/api/beers", jsonParser, ( req, res, next ) => {
 
 });
 
-app.put( "/api/beers/:id", jsonParser, ( req, res, next ) => {
-	let id = req.params.id;
+app.put( "/api/beers/:beer", jsonParser, ( req, res, next ) => {
+	let beerName = req.params.beer;
 
-	if ( !id ){
-		res.statusMessage = "Missing 'id' field in params!";
+	if ( !beerName ){
+		res.statusMessage = "Missing 'beer' field in params!";
 		return res.status( 406 ).json({
-			message : "Missing 'id' field in params!",
+			message : "Missing 'beer' field in params!",
 			status : 406
 		});
 	}
 
-	BeerList.put(id, req.body.newValue)
-		.then( student => {
+	BeerList.addReview(beerName, req.body.review)
+		.then( beer => {
 			return res.status( 201 ).json({
-				message : "Beer updated",
+				message : "Review added to beer",
 				status : 201,
-				student : student
+				beer : beer
 			});
 		})
 		.catch( error => {
@@ -719,13 +719,16 @@ app.delete( "/api/payments/:id", ( req, res, next ) => {
 });
 
 app.get("/api/session", (req, res, next) => {
+	console.log("GET SESSION");
 	sess = req.session;
+	console.log(sess);
 
 	if (sess.email) {
 		return res.status(200).json({
 			email: sess.email
 		});
-	}
+	} 
+	return res.status(404).json("Email not found");
 });
 
 let server;

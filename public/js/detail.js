@@ -1,3 +1,6 @@
+const urlParams = new URLSearchParams(window.location.search);
+const beer = urlParams.get('beer');
+
 function loadReviews(reviews) {
     let len = reviews.length;
     for(let i = 0; i < len; i++) {
@@ -30,7 +33,59 @@ function loadReviews(reviews) {
     }
 }
 
-function loadDetail(beer) {
+function postReview(comment, rating, user) {
+    let data = {
+        user : user,
+        comment : comment,
+        rating : rating
+    }
+
+    let settings = {
+        method : 'post',
+        headers : { 'Content-Type': 'application/json' },
+        body : JSON.stringify(data)
+    }
+
+    fetch("/api/reviews", settings)
+        .then(res => {
+            if(res.ok) {
+                return res.json();
+            }
+            throw new Error(res.statusText);
+        })
+        .then(resJSON => {
+            let reviewData = {
+                review : resJSON.review._id
+            }
+
+            let settings = {
+                method : 'put',
+                headers : { 'Content-Type': 'application/json' },
+                body : JSON.stringify(reviewData)
+            }
+
+            let url = "/api/beers/" + beer;
+
+            fetch(url, settings)
+                .then(res => {
+                    if(res.ok) {
+                        return res.json();
+                    } 
+                    throw new Error(res.statusText);
+                })
+                .then(_ => {
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function loadDetail() {
     let url = "/api/beers/" + beer;
     fetch(url)
         .then(res => {
@@ -72,14 +127,45 @@ function loadDetail(beer) {
         })
 }
 
-function init() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('beer');
-    loadDetail(myParam);
+function getUser() {
+    console.log("GET USER");
+    fetch("/api/session")
+        .then(res => {
+            if(res.ok) {
+                return res.json();
+            }
+            throw new Error(res.statusText);
+        })
+        .then(resJSON => {
+            console.log(resJSON);
+            return "test";
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function init() {    
+    loadDetail();
+
     $("#backBtn").on("click", function(e) {
         e.preventDefault();
         window.history.back();
-    })
+    });
+
+    $("#beerRating").on("change", function(e) {
+        $("#showRating").val($("#beerRating").val()/10);
+    });
+
+    $("#newReview").on("submit", function(e) {
+        e.preventDefault();
+        let comment = $("#reviewComment").val();
+        let rating = $("#beerRating").val()/10;
+        let user = "test5@test.com";
+
+        postReview(comment, rating, user);
+    });
+
 }
 
 init();
