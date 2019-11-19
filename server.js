@@ -16,9 +16,7 @@ mongoose.Promise = global.Promise;
 app.use( express.static( "public" ) );
 app.use( morgan( "dev" ) );
 
-mongoose.connect(DATABASE_URL, {
-    useMongoClient: true
-});
+mongoose.connect(DATABASE_URL);
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 
@@ -93,18 +91,17 @@ app.put( "/api/beers/:id", jsonParser, ( req, res, next ) => {
 		});
 });
 
-app.get( "/api/beers/:id", ( req, res, next ) => {
-	let id = req.params.id;
-
-	if ( !id ){
-		res.statusMessage = "Missing 'id' field in params!";
+app.get( "/api/beers/:name", ( req, res, next ) => {
+	let name = req.params.name;
+	if ( !name ){
+		res.statusMessage = "Missing 'name' field in params!";
 		return res.status( 406 ).json({
-			message : "Missing 'id' field in params!",
+			message : "Missing 'name' field in params!",
 			status : 406
 		});
 	}
 
-	BeerList.get_by_id(id)
+	BeerList.get_by_name(name)
 		.then( beer => {
 			return res.status( 200 ).json( beer );
 		})

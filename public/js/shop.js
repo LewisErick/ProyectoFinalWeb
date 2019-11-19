@@ -11,14 +11,12 @@ function getAllBeers() {
             for(let i = 0; i < len; i++) {
                 $("#beerCatalog").append(
                     `<div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <div class="row" id="selectBeer">
+                            <div class="col-md-12" id="name">
                                 <h4>
                                     ${resJSON[i].Nombre}
                                 </h4>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <img alt="Bootstrap Image Preview" src=${resJSON[i].fotoURL} height="200" width=160"/>
                                 <div class="row">
@@ -28,22 +26,24 @@ function getAllBeers() {
                                         </h5>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        
-                                        <button type="button" class="btn btn-success">
-                                            Buy
-                                        </button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        
-                                        <button type="button" class="btn btn-success">
-                                            Add to cart
-                                        </button>
-                                    </div>
-                                </div>
-                                <hr style="height: 1px; background-color: black"/>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    
+                                    <button type="button" class="btn btn-success">
+                                        Buy
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    
+                                    <button type="button" class="btn btn-primary">
+                                        Add to cart
+                                    </button>
+                                </div>
+                            </div>
+                            <hr style="height: 1px; background-color: black"/>
                         </div>
                     </div>`);
             }
@@ -55,43 +55,13 @@ function getAllBeers() {
 
 function init() {
     getAllBeers();
+
+    $("div").on("click", "#selectBeer", function(e) {
+        let beer = $(this).find("h4")["0"].innerText;
+        console.log(beer);
+        let url = "detail.html?beer=" + beer;
+        window.location.href = url;
+    })
 }
 
 init();
-
-
-/* <div class="col-md-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h3>
-                1.1
-            </h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <img alt="Bootstrap Image Preview" src="https://www.layoutit.com/img/sports-q-c-140-140-3.jpg" />
-            <div class="row">
-                <div class="col-md-6">
-                    
-                    <button type="button" class="btn btn-success">
-                        Button
-                    </button>
-                </div>
-                <div class="col-md-6">
-                    
-                    <button type="button" class="btn btn-success">
-                        Button
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>
-                h3. Lorem ipsum dolor sit amet.
-            </h3>
-        </div>
-    </div>
-</div> */

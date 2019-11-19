@@ -5,13 +5,13 @@ mongoose.Promise = global.Promise;
 
 // Beer SCHEMA and API definition.
 let beerSchema = mongoose.Schema({
-    nombre : { type : String },
-    cerveceria : { type : String },
+    Nombre : { type : String },
+    Cervecería : { type : String },
 	IBU : { type : Number },
 	ABV : { type : Number },
 	SRM : { type : Number },
-	estilo : { type : String },
-	origen : { type : String },
+	Estilo : { type : String },
+	Origen : { type : String },
 	fotoURL : { type : String },
 });
 
@@ -47,7 +47,7 @@ let BeerList = {
 					});
 	},
 	get_by_name: function( name ) {
-		return Beer.findOne({nombre: name})
+		return Beer.findOne({Nombre: name})
 					.then(beer=> {
 						return beer;
 					})
@@ -56,7 +56,7 @@ let BeerList = {
 					});
 	},
 	put: function( name, newValue ) {
-		return Beer.findOneAndUpdate({nombre: name}, {$set: newValue}, {new: true})
+		return Beer.findOneAndUpdate({Nombre: name}, {$set: newValue}, {new: true})
 					.then(beer=> {
 						return beer;
 					})
@@ -65,7 +65,7 @@ let BeerList = {
 					});
 	},
 	delete: function(name) {
-		return Beer.findOneAndRemove({nombre: name})
+		return Beer.findOneAndRemove({Nombre: name})
 					.then(beer => {
 						return beer;
 					})
