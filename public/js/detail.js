@@ -100,6 +100,7 @@ function loadDetail() {
             }
 
             $("#beerName").text(resJSON.Nombre);
+            console.log(resJSON);
             $("#beerDetailImg").attr({"src": resJSON.fotoURL, "height":200, "width":160});
             $("#style").html(`<b>Style: </b> ${resJSON.Estilo}`);
             $("#brewery").html(`<b>Brewery: </b> ${resJSON.Cervecería}`);

@@ -3,7 +3,7 @@ let express = require( "express" );
 let morgan = require( "morgan" );
 let mongoose = require( "mongoose" );
 let bodyParser = require( "body-parser" );
-let { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList } = require('./model');
+let { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList, ShoppingCartList } = require('./model');
 const {DATABASE_URL, PORT} = require('./config');
 
 const session = require('express-session');
@@ -28,6 +28,8 @@ app.use(session({
     store: new MongoStore({ mongooseConnection: db })
 }));
 
+// Routes
+
 app.get("/", (req, res, next) => {
 	sess = req.session;
 	if (sess.email) {
@@ -44,6 +46,10 @@ app.get("/shop", (req, res, next) => {
 	}
 	res.sendFile("shop.html", {root: "public"});
 });
+
+
+
+// API
 
 app.get( "/api/beers", ( req, res, next ) => {
 	BeerList.get()
@@ -394,13 +400,27 @@ app.get( "/api/users", ( req, res, next ) => {
 
 app.post( "/api/users", jsonParser, ( req, res, next ) => {
 	let newUser = req.body;
-	UserList.post(newUser)
-		.then( user => {
-			return res.status( 201 ).json({
-				message : "User added to database.",
-				status : 201,
-				user : user
-			});
+	
+	// Create the unique shopping cart that belongs to the user.
+	ShoppingCartList.post({})
+		.then( shoppingCart => {
+			newUser["shoppingCart"] = shoppingCart;
+			UserList.post(newUser)
+				.then( user => {
+					return res.status( 201 ).json({
+						message : "User added to database.",
+						status : 201,
+						user : user
+					});
+				})
+				.catch( error => {
+					res.statusMessage = "Something went wrong with the DB. Try again later.";
+					return res.status( 500 ).json({
+						status : 500,
+						message : "Something went wrong with the DB. Try again later.",
+						err: error
+					})
+				});
 		})
 		.catch( error => {
 			res.statusMessage = "Something went wrong with the DB. Try again later.";
