@@ -6,6 +6,7 @@ function login(email, password) {
         "password" : password
     };
 
+    console.log(data);
     fetch(url, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -13,13 +14,14 @@ function login(email, password) {
           'Content-Type': 'application/json'
         }})
         .then(res => {
+            console.log(res);
             if(res.ok) {
                 return res.json();
             }
             throw new Error(res.statusText);
         })
         .then(resJSON => {
-            window.location.replace("/shop.html");
+            window.location.replace("/shop");
             console.log(resJSON);
         }) 
         .catch(err => {
@@ -45,5 +47,7 @@ function init() {
         }
     });
 }
+
+console.log("login");
 
 init();

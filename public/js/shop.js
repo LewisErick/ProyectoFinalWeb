@@ -53,15 +53,58 @@ function getAllBeers() {
         });
 }
 
+function getUser() {
+    var email;
+    $.ajax({
+        url: "/api/session",
+        type: 'GET',
+        success: function(responseJSON) {
+            if (responseJSON.ok || responseJSON.email) {
+                $.ajax({
+                    url: "/api/users/" + responseJSON.email,
+                    type: 'GET',
+                    success: function(responseJSON) {
+                        if (responseJSON.email) {
+                            $("#user-welcome").html("Welcome, " + responseJSON.email);
+                            $("#logout").show();
+
+                            $("#logout").on("click", function(event) {
+                                event.preventDefault();
+                                $.ajax({
+                                    url: "/api/users/logout",
+                                    type: 'POST',
+                                    success: function(responseJSON) {
+                                        window.location.reload(true);
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(`${xhr.status}: ${thrownError}`);
+                    }
+                });
+            } else {
+                throw new Error("Couldn't retrieve session. Running as user");
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(`${xhr.status}: ${thrownError}`);
+            $("#errorDiv").html(`${xhr.status}: ${thrownError}`);
+        }
+    });
+}
+
 function init() {
+    getUser();
     getAllBeers();
 
-    $("div").on("click", "#selectBeer", function(e) {
+    $("#beerCatalog").on("click", "#selectBeer", function(e) {
         let beer = $(this).find("h4")["0"].innerText;
         console.log(beer);
-        let url = "detail.html?beer=" + beer;
+        let url = "/static/detail.html?beer=" + beer;
         window.location.href = url;
-    })
+    });
 }
 
 init();

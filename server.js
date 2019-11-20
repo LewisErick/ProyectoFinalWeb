@@ -13,7 +13,7 @@ let app = express();
 let jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
 
-app.use( express.static( "public" ) );
+app.use('/static', express.static('public'));
 app.use( morgan( "dev" ) );
 
 mongoose.connect(DATABASE_URL);
@@ -23,9 +23,27 @@ const db = mongoose.connection;
 app.use(session({
     secret: 'my-secret',
     resave: false,
-    saveUninitialized: true,
+	saveUninitialized: true,
+	maxAge: 1000 * 60,
     store: new MongoStore({ mongooseConnection: db })
 }));
+
+app.get("/", (req, res, next) => {
+	sess = req.session;
+	if (sess.email) {
+		res.sendFile("shop.html", {root: "public"});
+	} else {
+		res.sendFile("login.html", {root: "public"});
+	}
+})
+
+app.get("/shop", (req, res, next) => {
+	sess = req.session;
+	if (sess.email) {
+		console.log(sess.email);
+	}
+	res.sendFile("shop.html", {root: "public"});
+});
 
 app.get( "/api/beers", ( req, res, next ) => {
 	BeerList.get()
@@ -426,10 +444,10 @@ app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
 app.get("/api/users/:id", ( req, res, next) => {
 	sess = req.session;
 
-	if (sess.email == req.params.id || sess.debug) {
+	if (sess.email == req.params.id) {
 		UserList.get_by_id(sess.email)
-			.then( users => {
-				return res.status( 200 ).json( users );
+			.then( user => {
+				return res.status( 200 ).json( user );
 			})
 			.catch( error => {
 				res.statusMessage = "Something went wrong with the DB. Try again later.";
@@ -441,7 +459,7 @@ app.get("/api/users/:id", ( req, res, next) => {
 	}
 });
 
-app.post( "/api/users/login", bodyParser, ( req, res, next ) => {
+app.post( "/api/users/login", jsonParser, ( req, res, next ) => {
 	let email = req.body.email;
 
 	if ( !email ){
@@ -470,6 +488,12 @@ app.post( "/api/users/login", bodyParser, ( req, res, next ) => {
 				message : "Something went wrong with the DB. Try again later."
 			})
 		});
+});
+
+app.post("/api/users/logout", (req, res, next) => {
+	req.session.destroy();
+
+	return res.status(200).json("Successful log out.");
 });
 
 app.delete( "/api/users/:id", ( req, res, next ) => {
@@ -719,9 +743,7 @@ app.delete( "/api/payments/:id", ( req, res, next ) => {
 });
 
 app.get("/api/session", (req, res, next) => {
-	console.log("GET SESSION");
 	sess = req.session;
-	console.log(sess);
 
 	if (sess.email) {
 		return res.status(200).json({
