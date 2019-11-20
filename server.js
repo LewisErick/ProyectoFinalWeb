@@ -9,6 +9,9 @@ const {DATABASE_URL, PORT} = require('./config');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 let app = express();
 let jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
@@ -31,6 +34,7 @@ app.use(session({
 // Routes
 
 app.get("/", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	sess = req.session;
 	if (sess.email) {
 		res.sendFile("shop.html", {root: "public"});
@@ -40,18 +44,19 @@ app.get("/", (req, res, next) => {
 })
 
 app.get("/shop", (req, res, next) => {
-	sess = req.session;
-	if (sess.email) {
-		console.log(sess.email);
-	}
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	res.sendFile("shop.html", {root: "public"});
 });
 
-
+app.get("/cart", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+	res.sendFile("cart.html", {root: "public"});
+});
 
 // API
 
 app.get( "/api/beers", ( req, res, next ) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	BeerList.get()
 		.then( beers => {
 			return res.status( 200 ).json( beers );
@@ -400,39 +405,48 @@ app.get( "/api/users", ( req, res, next ) => {
 
 app.post( "/api/users", jsonParser, ( req, res, next ) => {
 	let newUser = req.body;
-	
-	// Create the unique shopping cart that belongs to the user.
-	ShoppingCartList.post({})
-		.then( shoppingCart => {
-			newUser["shoppingCart"] = shoppingCart;
-			UserList.post(newUser)
-				.then( user => {
-					return res.status( 201 ).json({
-						message : "User added to database.",
-						status : 201,
-						user : user
-					});
-				})
-				.catch( error => {
-					res.statusMessage = "Something went wrong with the DB. Try again later.";
-					return res.status( 500 ).json({
-						status : 500,
-						message : "Something went wrong with the DB. Try again later.",
-						err: error
+
+	bcrypt.hash(newUser.password, saltRounds, function(err, hash) {
+		if (err) {
+			return res.status(500).json(err);
+		} else {
+			newUser.password = hash;
+
+			// Create the unique shopping cart that belongs to the user.
+			ShoppingCartList.post({})
+			.then( shoppingCart => {
+				newUser["shoppingCart"] = shoppingCart;
+				UserList.post(newUser)
+					.then( user => {
+						return res.status( 201 ).json({
+							message : "User added to database.",
+							status : 201,
+							user : user
+						});
 					})
-				});
-		})
-		.catch( error => {
-			res.statusMessage = "Something went wrong with the DB. Try again later.";
-			return res.status( 500 ).json({
-				status : 500,
-				message : "Something went wrong with the DB. Try again later.",
-				err: error
+					.catch( error => {
+						res.statusMessage = "Something went wrong with the DB. Try again later.";
+						return res.status( 500 ).json({
+							status : 500,
+							message : "Something went wrong with the DB. Try again later.",
+							err: error
+						})
+					});
 			})
-		});
+			.catch( error => {
+				res.statusMessage = "Something went wrong with the DB. Try again later.";
+				return res.status( 500 ).json({
+					status : 500,
+					message : "Something went wrong with the DB. Try again later.",
+					err: error
+				})
+			});
+		}
+	});
 });
 
 app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	let id = req.params.id;
 
 	if ( !id ){
@@ -462,6 +476,7 @@ app.put( "/api/users/:id", jsonParser, ( req, res, next ) => {
 });
 
 app.get("/api/users/:id", ( req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	sess = req.session;
 
 	if (sess.email == req.params.id) {
@@ -492,16 +507,20 @@ app.post( "/api/users/login", jsonParser, ( req, res, next ) => {
 
 	UserList.get_by_email(email)
 		.then( user => {
-			if (req.body.password != user.password) {
-				return res.status(401).json("Incorrect password.");
-			}
+			bcrypt.compare(req.body.password, user.password, function(err, compRes) {
+				if (compRes) {
+					sess = req.session;
+					sess.email = user._id;
+					sess.cart = user.shoppingCart._id;
 
-			sess = req.session;
-			sess.email = user._id;
-
-			return res.status( 200 ).json( user );
+					return res.status(200).json( user );
+				} else {
+					return res.status(401).json("Incorrect password.");
+				}
+			});
 		})
 		.catch( error => {
+			console.log(error);
 			res.statusMessage = "Something went wrong with the DB. Try again later.";
 			return res.status( 500 ).json({
 				status : 500,
@@ -511,6 +530,7 @@ app.post( "/api/users/login", jsonParser, ( req, res, next ) => {
 });
 
 app.post("/api/users/logout", (req, res, next) => {
+	console.log("Log out");
 	req.session.destroy();
 
 	return res.status(200).json("Successful log out.");
@@ -763,6 +783,7 @@ app.delete( "/api/payments/:id", ( req, res, next ) => {
 });
 
 app.get("/api/session", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	sess = req.session;
 
 	if (sess.email) {
@@ -770,7 +791,82 @@ app.get("/api/session", (req, res, next) => {
 			email: sess.email
 		});
 	} 
-	return res.status(404).json("Email not found");
+	return res.status(404).json("Session not found");
+});
+
+app.get("/api/cart", (req, res, next) => {
+	sess = req.session;
+
+	if (sess.cart) {
+		return res.status(200).json({
+			cart: sess.cart
+		});
+	} else {
+		ShoppingCartList.post({})
+			.then(cart => {
+				sess.cart = cart._id;
+				return res.status(200).json( {cart: cart._id} );
+			})
+			.catch( error => {
+				res.statusMessage = "Something went wrong with the DB. Try again later.";
+				return res.status( 500 ).json({
+					status : 500,
+					message : "Something went wrong with the DB. Try again later."
+				})
+			});
+	}
+});
+
+// Get beers in cart.
+app.get("/api/cart/:id", (req, res, next) => {
+	if (!req.params.id) {
+		return res.status(406).json({
+			message: "Missing 'id' field in params.",
+			status: 406
+		});
+	}
+	ShoppingCartList.get_by_id(req.params.id)
+		.then(cart => {
+			return res.status(200).json(cart);
+		})
+		.catch( error => {
+			res.statusMessage = "Something went wrong with the DB. Try again later.";
+			return res.status( 500 ).json({
+				status : 500,
+				message : "Something went wrong with the DB. Try again later."
+			})
+		});
+});
+
+app.post("/api/cart/:id", jsonParser, (req, res, next) => {
+	if (!req.params.id) {
+		return res.status(406).json({
+			message: "Missing 'id' field in params.",
+			status: 406
+		});
+	}
+
+	if (!req.body.beerId) {
+		return res.status(406).json({
+			message: "Missing 'beerId' field in body.",
+			status: 406
+		});
+	}
+
+	ShoppingCartList.add_beer(req.params.id, req.body.beerId)
+		.then(cart => {
+			return res.status(200).json({
+				message: "Successfully added beer to cart.",
+				status: 200
+			})
+		})
+		.catch( error => {
+			res.statusMessage = "Something went wrong with the DB. Try again later.";
+			return res.status( 500 ).json({
+				status : 500,
+				message : "Something went wrong with the DB. Try again later."
+			})
+		});
 });
 
 let server;

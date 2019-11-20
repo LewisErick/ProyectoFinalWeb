@@ -389,16 +389,33 @@ let PaymentMethodList = {
 	}
 }
 
-
+let ShoppingCartEntrySchema = mongoose.Schema({
+	position: Number,
+	quantity: Number,
+	beer: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Beer'
+	}
+});
+let ShoppingCartEntry = mongoose.model( 'ShoppingCartEntry', ShoppingCartEntrySchema );
+let ShoppingCartEntryList = {
+	post : function( newEntry ){
+		return ShoppingCartEntry.create(newEntry)
+				.then(newEntry => {
+					return newEntry;
+				})
+				.catch( error => {
+					console.log(newUser, error);
+					throw Error(error);
+				});
+	}
+};
 
 // Shopping cart schema and API definition.
 let shoppingCartSchema = mongoose.Schema({
     entries: [{
-		quantity: Number,
-		beer: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Beer'
-		}
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "ShoppingCartEntry"
 	}]
 });
 
@@ -412,6 +429,23 @@ let ShoppingCartList = {
 				.catch( error => {
 					throw Error(error);
 				});
+	},
+	add_beer: function(id, beerId) {
+		return ShoppingCart.findOne({_id: id})
+			.then(shoppingCart=> {
+				let nextPosition = shoppingCart.entries.length;
+				ShoppingCartEntryList.post({position: nextPosition, quantity: 1, beer: beerId})
+					.then(entry => {
+						let entryId = entry._id;
+						return ShoppingCart.findOneAndUpdate( { _id: id }, { $push: { entries: entryId } } );
+					})
+					.catch(err => {
+						throw Error(err);
+					});
+			})
+			.catch( error => {
+				throw Error(error);
+			});
 	},
 	post : function( newUser ){
 		newUser.id = uuid()
@@ -451,7 +485,7 @@ let ShoppingCartList = {
 						throw new Error(error);
 					});
 	}
-}
+};
 
 
 module.exports = { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList, ShoppingCartList };
