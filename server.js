@@ -53,6 +53,11 @@ app.get("/cart", (req, res, next) => {
 	res.sendFile("cart.html", {root: "public"});
 });
 
+app.get("/ticket/:id", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+	res.sendFile("receipt.html", {root: "public"});
+});
+
 // API
 
 app.get( "/api/beers", ( req, res, next ) => {
@@ -203,24 +208,65 @@ app.get( "/api/tickets", ( req, res, next ) => {
 		});
 });
 
-app.post( "/api/tickets", jsonParser, ( req, res, next ) => {
-	let newTicket = req.body;
-	TicketList.post(newTicket)
-		.then( ticket => {
-			return res.status( 201 ).json({
-				message : "Ticket added to database.",
-				status : 201,
-				ticket : ticket
-			});
-		})
-		.catch( error => {
-			res.statusMessage = "Something went wrong with the DB. Try again later.";
-			return res.status( 500 ).json({
-				status : 500,
-				message : "Something went wrong with the DB. Try again later.",
-				err: error
+app.post("/api/cart/clear", jsonParser, (req, res, next) => {
+	if (sess.cart) {
+		ShoppingCartList.put(sess.cart, {entries: []})
+			.then(cart => {
+				return res.status(201).json(
+					{
+						statusCode: 200
+					}
+				);
 			})
-		});
+			.catch( error => {
+				res.statusMessage = "Something went wrong with the DB. Try again later.";
+				return res.status( 500 ).json({
+					status : 500,
+					message : "Something went wrong with the DB. Try again later.",
+					err: error
+				})
+			});
+	} else {
+		return res.status(406).json("No cart to clear.");
+	}
+})
+
+app.post( "/api/tickets", jsonParser, ( req, res, next ) => {
+	var newTicket = {};
+	var sess = req.session;
+	if (sess.email) {
+		newTicket.user = session.email;
+	}
+	if (sess.cart) {
+		ShoppingCartList.get_by_id(sess.cart)
+			.then(cart => {
+				newTicket.entries = cart.entries;
+				TicketList.post(newTicket)
+					.then( ticket => {
+						return res.status( 201 ).json({
+							message : "Ticket added to database.",
+							status : 201,
+							ticket : ticket._id
+						});
+					})
+					.catch( error => {
+						res.statusMessage = "Something went wrong with the DB. Try again later.";
+						return res.status( 500 ).json({
+							status : 500,
+							message : "Something went wrong with the DB. Try again later.",
+							err: error
+						})
+					});
+			})
+			.catch( error => {
+				res.statusMessage = "Something went wrong with the DB. Try again later.";
+				return res.status( 500 ).json({
+					status : 500,
+					message : "Something went wrong with the DB. Try again later.",
+					err: error
+				})
+			});
+	}
 });
 
 app.put( "/api/tickets/:id", jsonParser, ( req, res, next ) => {

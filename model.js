@@ -89,11 +89,17 @@ let BeerList = {
 
 // Ticket and API definition.
 let ticketSchema = mongoose.Schema({
-    user : { type: mongoose.Schema.Types.ObjectId,
+	user: { type: mongoose.Schema.Types.ObjectId,
 		ref: 'User' },
-    beer : { type: mongoose.Schema.Types.ObjectId,
-		ref: 'Beer' },
-    total : { type : Number },
+	entries: [{
+		quantity: Number,
+		beer: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Beer'
+		}
+	}],
+	total: Number,
+	purchase_date: Date,
 	payment_method : { type: mongoose.Schema.Types.ObjectId,
 		ref: 'PaymentMethod' }
 });

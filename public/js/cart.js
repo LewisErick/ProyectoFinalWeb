@@ -188,4 +188,29 @@ function retrieveCart() {
 $(document).ready(function() {
     retrieveCart();
     getUser();
+
+    $("#buy").on("click", function(event) {
+        fetch("/api/tickets", {
+            method: 'POST'})
+            .then( response => {
+                if (response.ok || response.ticket) {
+                    return response.json();
+                }
+                throw new Error(res.statusText);
+            })
+            .then(responseJSON => {
+                fetch("api/cart/clear", {method: 'POST'})
+                    .then(clearResponse => {
+                        if (clearResponse.ok || clearResponse.statusCode == 200) {
+                            window.location.href = "/static/receipt.html?r=" + responseJSON.ticket;
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })        
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    });
 });
