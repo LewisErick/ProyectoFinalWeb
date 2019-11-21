@@ -16,6 +16,7 @@ This web page has 5 different pages:
     * Leave your review
 * **Cart**
     * Shopping cart with all the beers you've added, the quantity, the unitary price and the total price
+    * Remove items from the shopping cart
 * **Receipt**
     * After you buy something, you see the receipt with your purchase details
 
