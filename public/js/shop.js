@@ -23,6 +23,7 @@ function getAllBeers() {
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h5>
+                                            Price: $${resJSON[i].Price}<br>
                                             Style: ${resJSON[i].Estilo}
                                         </h5>
                                     </div>

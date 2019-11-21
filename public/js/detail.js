@@ -159,6 +159,7 @@ function loadDetail() {
 
             $("#beerName").text(resJSON.Nombre);
             $("#beerDetailImg").attr({"src": resJSON.fotoURL, "height":200, "width":160});
+            $("#price").html(`<b>Price: </b> $${resJSON.Price}`);
             $("#style").html(`<b>Style: </b> ${resJSON.Estilo}`);
             $("#brewery").html(`<b>Brewery: </b> ${resJSON.Cervecería}`);
             $("#origin").html(`<b>Origin: </b> ${resJSON.Origen}`);
