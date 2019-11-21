@@ -64,7 +64,7 @@ function addToShoppingCart(beerName) {
             throw new Error(res.statusText);
         })
         .then(beerResJSON => {
-            data = {
+            var data = {
                 beerId: beerResJSON._id
             }
             console.log(data);
@@ -74,7 +74,7 @@ function addToShoppingCart(beerName) {
                 success: function(sessionCartJSON) {
                     console.log(sessionCartJSON);
                     if (sessionCartJSON.ok || sessionCartJSON.cart) {
-                        fetch("api/cart/" + sessionCartJSON.cart, {
+                        fetch("/api/cart/" + sessionCartJSON.cart, {
                             method: 'POST',
                             body: JSON.stringify(data),
                             headers:{

@@ -1,6 +1,63 @@
 const urlParams = new URLSearchParams(window.location.search);
 const beer = urlParams.get('beer');
 
+function addToShoppingCart(beerName) {
+    console.log("1. " + beerName);
+    fetch("/api/beers/" + beerName)
+        .then(res => {
+            if(res.ok) {
+                return res.json();
+            }
+            throw new Error(res.statusText);
+        })
+        .then(beerResJSON => {
+            var data = {
+                beerId: beerResJSON._id
+            }
+            console.log(data);
+            $.ajax({
+                url: "/api/cart",
+                type: 'GET',
+                success: function(sessionCartJSON) {
+                    console.log(sessionCartJSON);
+                    if (sessionCartJSON.ok || sessionCartJSON.cart) {
+                        fetch("/api/cart/" + sessionCartJSON.cart, {
+                            method: 'POST',
+                            body: JSON.stringify(data),
+                            headers:{
+                              'Content-Type': 'application/json'
+                            }})
+                            .then(res => {
+                                if(res.ok) {
+                                    return res.json();
+                                }
+                                throw new Error(res.statusText);
+                            })
+                            .then(resJSON => {
+                                alert("Beer added successfuly!");
+                            })
+                            .catch(err => {
+                                $("#error").text(err);
+                                $("#error").css("visibility", "visible");
+                                console.log(err);
+                            });
+                    } else {
+                        throw new Error("Couldn't retrieve session. Running as user");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(`${xhr.status}: ${thrownError}`);
+                    $("#errorDiv").html(`${xhr.status}: ${thrownError}`);
+                }
+            });
+        })
+        .catch(err => {
+            $("#error").text(err);
+            $("#error").css("visibility", "visible");
+            console.log(err);
+        });
+}
+
 function loadReviews(reviews) {
     let len = reviews.length;
     for(let i = 0; i < len; i++) {
@@ -129,25 +186,54 @@ function loadDetail() {
 }
 
 function getUser() {
-    console.log("GET USER");
-    fetch("/api/session")
-        .then(res => {
-            if(res.ok) {
-                return res.json();
+    $("#logout").on("click", function(event) {
+        event.preventDefault();
+        if ($(this).val() == "Log Out") {
+            $.ajax({
+                url: "/api/users/logout",
+                type: 'POST',
+                success: function(responseJSON) {
+                    window.location.reload(true);
+                }
+            });
+        } else {
+            window.location.href = "/";
+        }
+    });
+
+    var email;
+    $.ajax({
+        url: "/api/session",
+        type: 'GET',
+        success: function(responseJSON) {
+            if (responseJSON.ok || responseJSON.email) {
+                $.ajax({
+                    url: "/api/users/" + responseJSON.email,
+                    type: 'GET',
+                    success: function(responseJSON) {
+                        if (responseJSON.email) {
+                            $("#user-welcome").html("Welcome, " + responseJSON.email);
+                            $("#logout").val("Log Out");
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(`${xhr.status}: ${thrownError}`);
+                    }
+                });
+            } else {
+                throw new Error("Couldn't retrieve session. Running as user");
             }
-            throw new Error(res.statusText);
-        })
-        .then(resJSON => {
-            console.log(resJSON);
-            return "test";
-        })
-        .catch(err => {
-            console.log(err);
-        });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(`${xhr.status}: ${thrownError}`);
+            $("#errorDiv").html(`${xhr.status}: ${thrownError}`);
+        }
+    });
 }
 
 function init() {    
     loadDetail();
+    getUser();
 
     $("#backBtn").on("click", function(e) {
         e.preventDefault();
@@ -167,6 +253,9 @@ function init() {
         postReview(comment, rating, user);
     });
 
+    $("#beerBtnAdd").on("click", function(e) {
+        addToShoppingCart($("#beerName").text());
+    });
 }
 
 init();

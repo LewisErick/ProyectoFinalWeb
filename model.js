@@ -13,6 +13,7 @@ let beerSchema = mongoose.Schema({
 	Estilo : { type : String },
 	Origen : { type : String },
 	fotoURL : { type : String },
+	Price : {type : Number},
 	reviews : { type: [mongoose.Schema.Types.ObjectId],
 		ref: 'Review' },
 });
@@ -263,6 +264,101 @@ let ProviderList = {
 	}
 }
 
+// Shopping cart schema and API definition.
+let shoppingCartSchema = mongoose.Schema({
+    entries: [{
+		quantity: Number,
+		beer: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Beer'
+		}
+	}]
+});
+
+let ShoppingCart = mongoose.model( 'ShoppingCart', shoppingCartSchema );
+let ShoppingCartList = {
+	get : function(){
+		return ShoppingCart.find()
+				.then( shoppingCarts => {
+					return shoppingCarts;
+				})
+				.catch( error => {
+					throw Error(error);
+				});
+	},
+	add_beer: function(id, beerId) {
+		return ShoppingCart.findOneAndUpdate(
+			{ _id: id },
+			{ $push: {
+				entries: {
+					quantity: 1,
+					beer: beerId
+				}
+			} } )
+			.then(cart => {
+					return cart
+				}
+			)
+			.catch( error => {
+				throw Error(error);
+			});
+	},
+	remove_beer: function( id, beerId) {
+		return ShoppingCart.findOneAndUpdate(
+			{ _id: id },
+			{ $pull: {
+				entries: {
+					_id: beerId
+				}
+			} } )
+			.then(cart => {
+					return cart;
+				}
+			)
+			.catch( error => {
+				throw Error(error);
+			});
+	},
+	post : function( newUser ){
+		newUser.id = uuid()
+		return ShoppingCart.create(newUser)
+				.then(shoppingCart => {
+					return shoppingCart;
+				})
+				.catch( error => {
+					console.log(newUser, error);
+					throw Error(error);
+				});
+	},
+	get_by_id: function( id ) {
+		return ShoppingCart.findOne({_id: id})
+					.then(shoppingCart=> {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw Error(error);
+					});
+	},
+	put: function( id, newValue ) {
+		return ShoppingCart.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
+					.then(shoppingCart=> {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw Error(error);
+					});
+	},
+	delete: function(id) {
+		return ShoppingCart.findOneAndRemove({_id: id})
+					.then(shoppingCart => {
+						return shoppingCart;
+					})
+					.catch( error => {
+						throw new Error(error);
+					});
+	}
+};
+
 // User schema and API definition.
 let userSchema = mongoose.Schema({
     email: { type : String },
@@ -285,13 +381,13 @@ let UserList = {
 	post : function( newUser ){
 		newUser.id = uuid()
 		return User.create(newUser)
-				.then(user => {
-					return user;
-				})
-				.catch( error => {
-					console.log(newUser, error);
-					throw Error(error);
-				});
+			.then(user => {
+				return user;
+			})
+			.catch( error => {
+				console.log(newUser, error);
+				throw Error(error);
+			});
 	},
 	get_by_id: function( id ) {
 		return User.findOne({_id: id})
@@ -322,12 +418,13 @@ let UserList = {
 	},
 	delete: function(id) {
 		return User.findOneAndRemove({_id: id})
-					.then(user => {
-						return user;
-					})
-					.catch( error => {
-						throw new Error(error);
-					});
+			.then(user => {
+				return user;
+			})
+			.catch( error => {
+				console.log(error);
+				throw new Error(error);
+			});
 	}
 }
 
@@ -388,104 +485,6 @@ let PaymentMethodList = {
 					});
 	}
 }
-
-let ShoppingCartEntrySchema = mongoose.Schema({
-	position: Number,
-	quantity: Number,
-	beer: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Beer'
-	}
-});
-let ShoppingCartEntry = mongoose.model( 'ShoppingCartEntry', ShoppingCartEntrySchema );
-let ShoppingCartEntryList = {
-	post : function( newEntry ){
-		return ShoppingCartEntry.create(newEntry)
-				.then(newEntry => {
-					return newEntry;
-				})
-				.catch( error => {
-					console.log(newUser, error);
-					throw Error(error);
-				});
-	}
-};
-
-// Shopping cart schema and API definition.
-let shoppingCartSchema = mongoose.Schema({
-    entries: [{
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "ShoppingCartEntry"
-	}]
-});
-
-let ShoppingCart = mongoose.model( 'ShoppingCart', shoppingCartSchema );
-let ShoppingCartList = {
-	get : function(){
-		return ShoppingCart.find()
-				.then( shoppingCarts => {
-					return shoppingCarts;
-				})
-				.catch( error => {
-					throw Error(error);
-				});
-	},
-	add_beer: function(id, beerId) {
-		return ShoppingCart.findOne({_id: id})
-			.then(shoppingCart=> {
-				let nextPosition = shoppingCart.entries.length;
-				ShoppingCartEntryList.post({position: nextPosition, quantity: 1, beer: beerId})
-					.then(entry => {
-						let entryId = entry._id;
-						return ShoppingCart.findOneAndUpdate( { _id: id }, { $push: { entries: entryId } } );
-					})
-					.catch(err => {
-						throw Error(err);
-					});
-			})
-			.catch( error => {
-				throw Error(error);
-			});
-	},
-	post : function( newUser ){
-		newUser.id = uuid()
-		return ShoppingCart.create(newUser)
-				.then(shoppingCart => {
-					return shoppingCart;
-				})
-				.catch( error => {
-					console.log(newUser, error);
-					throw Error(error);
-				});
-	},
-	get_by_id: function( id ) {
-		return ShoppingCart.findOne({_id: id})
-					.then(shoppingCart=> {
-						return shoppingCart;
-					})
-					.catch( error => {
-						throw Error(error);
-					});
-	},
-	put: function( id, newValue ) {
-		return ShoppingCart.findOneAndUpdate({_id: id}, {$set: newValue}, {new: true})
-					.then(shoppingCart=> {
-						return shoppingCart;
-					})
-					.catch( error => {
-						throw Error(error);
-					});
-	},
-	delete: function(id) {
-		return ShoppingCart.findOneAndRemove({_id: id})
-					.then(shoppingCart => {
-						return shoppingCart;
-					})
-					.catch( error => {
-						throw new Error(error);
-					});
-	}
-};
 
 
 module.exports = { UserList, PaymentMethodList, ProviderList, BeerList, TicketList, ReviewList, ShoppingCartList };

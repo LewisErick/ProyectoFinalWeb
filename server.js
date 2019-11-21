@@ -120,6 +120,28 @@ app.put( "/api/beers/:beer", jsonParser, ( req, res, next ) => {
 		});
 });
 
+app.get("/api/beers/ind/:id", (req, res, next) => {
+	if (!req.params.id) {
+		res.statusMessage = "Missing 'id' field in params!";
+		return res.status( 406 ).json({
+			message : "Missing 'id' field in params!",
+			status : 406
+		});
+	}
+
+	BeerList.get_by_id(req.params.id)
+		.then( beer => {
+			return res.status( 200 ).json( beer );
+		})
+		.catch( error => {
+			res.statusMessage = "Something went wrong with the DB. Try again later.";
+			return res.status( 500 ).json({
+				status : 500,
+				message : "Something went wrong with the DB. Try again later."
+			})
+		});
+});
+
 app.get( "/api/beers/:name", ( req, res, next ) => {
 	let name = req.params.name;
 	if ( !name ){
@@ -547,9 +569,23 @@ app.delete( "/api/users/:id", ( req, res, next ) => {
 		});
 	}
 
+	if (session.email == id) {
+		session.destroy();
+	}
+
 	UserList.delete(id)
 		.then( user => {
-			return res.status( 200 ).json( user );
+			ShoppingCartList.delete(user.shoppingCart._id)
+				.then(cart => {
+					return res.status( 200 ).json( { user: user, cart: cart } );
+				})
+				.catch( error => {
+					res.statusMessage = "Something went wrong with the DB. Try again later.";
+					return res.status( 500 ).json({
+						status : 500,
+						message : "Something went wrong with the DB. Try again later."
+					})
+				});
 		})
 		.catch( error => {
 			res.statusMessage = "Something went wrong with the DB. Try again later.";
@@ -795,6 +831,7 @@ app.get("/api/session", (req, res, next) => {
 });
 
 app.get("/api/cart", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	sess = req.session;
 
 	if (sess.cart) {
@@ -819,15 +856,17 @@ app.get("/api/cart", (req, res, next) => {
 
 // Get beers in cart.
 app.get("/api/cart/:id", (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	if (!req.params.id) {
 		return res.status(406).json({
 			message: "Missing 'id' field in params.",
 			status: 406
 		});
 	}
+	
 	ShoppingCartList.get_by_id(req.params.id)
 		.then(cart => {
-			return res.status(200).json(cart);
+			return res.status(200).json({ cart: cart.entries });
 		})
 		.catch( error => {
 			res.statusMessage = "Something went wrong with the DB. Try again later.";
@@ -839,6 +878,7 @@ app.get("/api/cart/:id", (req, res, next) => {
 });
 
 app.post("/api/cart/:id", jsonParser, (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 	if (!req.params.id) {
 		return res.status(406).json({
 			message: "Missing 'id' field in params.",
@@ -857,6 +897,32 @@ app.post("/api/cart/:id", jsonParser, (req, res, next) => {
 		.then(cart => {
 			return res.status(200).json({
 				message: "Successfully added beer to cart.",
+				status: 200
+			})
+		})
+		.catch( error => {
+			res.statusMessage = "Something went wrong with the DB. Try again later.";
+			return res.status( 500 ).json({
+				status : 500,
+				message : "Something went wrong with the DB. Try again later."
+			})
+		});
+});
+
+app.delete("/api/cart/items", jsonParser, (req, res, next) => {
+	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+	if (!req.body.id) {
+		return res.status(406).json("Missing id in request body.");
+	}
+	if (!req.body.cart) {
+		return res.status(406).json("Missing cart in request body.");
+	}
+
+	return ShoppingCartList.remove_beer(req.body.cart, req.body.id)
+		.then(cart => {
+			return res.status(200).json({
+				message: "Successfuly removed beer from cart.",
+				cart: cart,
 				status: 200
 			})
 		})
