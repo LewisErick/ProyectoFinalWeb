@@ -12,8 +12,8 @@ function getAllBeers() {
             for(let i = 0; i < len; i++) {
                 $("#beerCatalog").append(
                     `<div class="col-md-4">
-                        <div class="row" id="selectBeer">
-                            <div class="col-md-12" id="name">
+                        <div class="row">
+                            <div class="col-md-12" id="selectBeer">
                                 <h4>
                                     ${resJSON[i].Nombre}
                                 </h4>
@@ -38,7 +38,7 @@ function getAllBeers() {
                                     </button>
                                 </div>
                                 <div class="col-md-6">
-                                    
+                                    <input size="3" value="1" id="cartAmount">
                                     <button type="button" class="btn btn-primary" id="beerBtnAdd">
                                         Add to cart
                                     </button>
@@ -54,7 +54,7 @@ function getAllBeers() {
         });
 }
 
-function addToShoppingCart(beerName) {
+function addToShoppingCart(beerName, amount) {
     console.log("1. " + beerName);
     fetch("/api/beers/" + beerName)
         .then(res => {
@@ -65,7 +65,8 @@ function addToShoppingCart(beerName) {
         })
         .then(beerResJSON => {
             var data = {
-                beerId: beerResJSON._id
+                beerId: beerResJSON._id,
+                quantity: amount
             }
             console.log(data);
             $.ajax({
@@ -177,7 +178,9 @@ function init() {
 
     $("#beerCatalog").on("click", "#beerBtnAdd", function(e) {
         let beer = $(this).parent().parent().find("#beerName").html();
-        addToShoppingCart(beer);
+        let amount = $(this).prev()["0"].value;
+        addToShoppingCart(beer, amount);
+        $(this).prev().val(1);
     });
 
 

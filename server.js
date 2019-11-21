@@ -938,8 +938,7 @@ app.post("/api/cart/:id", jsonParser, (req, res, next) => {
 			status: 406
 		});
 	}
-
-	ShoppingCartList.add_beer(req.params.id, req.body.beerId)
+	ShoppingCartList.add_beer(req.params.id, req.body.beerId, req.body.quantity)
 		.then(cart => {
 			return res.status(200).json({
 				message: "Successfully added beer to cart.",

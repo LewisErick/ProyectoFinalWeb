@@ -292,12 +292,12 @@ let ShoppingCartList = {
 					throw Error(error);
 				});
 	},
-	add_beer: function(id, beerId) {
+	add_beer: function(id, beerId, qty) {
 		return ShoppingCart.findOneAndUpdate(
 			{ _id: id },
 			{ $push: {
 				entries: {
-					quantity: 1,
+					quantity: qty,
 					beer: beerId
 				}
 			} } )
