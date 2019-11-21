@@ -9,9 +9,9 @@ This web page has 5 different pages:
     * Username and password form to login or register a new user
     * *This is the landing page the first time you go to the site, register a new user and login to access*
 * **Shop**
-    * Beer catalog with the option to instantly buy or add a beer to the cart
+    * Beer catalog with the option to instantly buy or add a given number of beers to your shopping cart
 * **Detail**
-    * Detailed view of a beer information, with the option to instantly buy or add that beer to the cart
+    * Detailed view of a beer information, with the option to instantly buy or add a given number of beers to your shopping cart
     * User reviews
     * Leave your review
 * **Cart**
