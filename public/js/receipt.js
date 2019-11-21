@@ -117,6 +117,6 @@ $(document).ready(function() {
     getUser();
 
     $("#continue").on("click", function(event) {
-        window.location.href = "/shop";
+        window.location.href = "/";
     });
 });
