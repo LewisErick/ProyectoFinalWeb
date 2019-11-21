@@ -266,6 +266,35 @@ function init() {
         getSession(comment, rating);
     });
 
+    $("#beerBtnBuy").on("click", function(e) {
+        let beer = $("#beerName").text();
+
+        var data = {
+            beer: beer,
+            quantity: 1
+        };
+
+        let settings = {
+            method : 'post',
+            headers : { 'Content-Type': 'application/json' },
+            body : JSON.stringify(data)
+        };
+
+        fetch("/api/tickets/buy", settings)
+            .then( response => {
+                if (response.ok || response.ticket) {
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
+            .then(responseJSON => {
+                window.location.href = "/static/receipt.html?r=" + responseJSON.ticket;
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    });
+
     $("#beerBtnAdd").on("click", function(e) {
         addToShoppingCart($("#beerName").text());
     });

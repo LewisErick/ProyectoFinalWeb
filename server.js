@@ -231,6 +231,46 @@ app.post("/api/cart/clear", jsonParser, (req, res, next) => {
 	}
 })
 
+app.post("/api/tickets/buy", jsonParser, (req, res, next) => {
+	var newTicket = {};
+	if (sess.email) {
+		newTicket.user = session.email;
+	}
+	BeerList.get_by_name(req.body.beer)
+		.then(beer => {
+			newTicket.entries = [
+				{
+					quantity: req.body.quantity,
+					beer: beer._id
+				}
+			]
+			TicketList.post(newTicket)
+				.then( ticket => {
+					return res.status( 201 ).json({
+						message : "Ticket added to database.",
+						status : 201,
+						ticket : ticket._id
+					});
+				})
+				.catch( error => {
+					res.statusMessage = "Something went wrong with the DB. Try again later.";
+					return res.status( 500 ).json({
+						status : 500,
+						message : "Something went wrong with the DB. Try again later.",
+						err: error
+					})
+				});
+		})
+		.catch( error => {
+			res.statusMessage = "Something went wrong with the DB. Try again later.";
+			return res.status( 500 ).json({
+				status : 500,
+				message : "Something went wrong with the DB. Try again later.",
+				err: error
+			})
+		});
+});
+
 app.post( "/api/tickets", jsonParser, ( req, res, next ) => {
 	var newTicket = {};
 	var sess = req.session;
