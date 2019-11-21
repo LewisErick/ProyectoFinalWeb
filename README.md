@@ -1,6 +1,6 @@
 # ProyectoFinalWeb
 
-##Cervezología App
+## Cervezología App
 This web app shows a crafted beer catalog, with a detailed view for each beer and reviews left by other users. You can add beers to your shopping cart and buy them, as well as leave your own review. 
 
 This web page has 5 different pages:
