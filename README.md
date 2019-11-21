@@ -30,5 +30,20 @@ This web page has 5 different pages:
    * GET api/beers/:name
    * DELETE api/beers/:id
 
+* **Tickets**
+   * POST api/tickets/buy -> Used for instant purchase
+   * POST /api/tickets -> Creates a receipt for the purchase of the items in the current shopping cart for the current user.
+   * GET /api/tickets/:id
+
+* **Session**
+   * GET /api/session -> Get ID of current user logged in (404 if not logged in)
+
+* **Shopping Cart**
+   * POST /api/cart/clear -> Clears current session user's shopping cart
+   * GET /api/cart -> Get ID of current shopping cart of current user (or guest)
+   * GET /api/cart/:id -> Get beers in the shopping cart with the specified ID
+   * POST /api/cart/:id -> Add beers to shopping cart
+   * DELETE /api/cart/items -> Remove beer from shopping cart 
+
 Heroku Production Link:
 https://intense-forest-79562.herokuapp.com
