@@ -170,10 +170,32 @@ function init() {
     });
 
     $("#beerCatalog").on("click", "#beerBtnBuy", function(e) {
-        let beer = $(this).find("h4")["0"].innerText;
+        let beer = $(this).parent().parent().find("#beerName").html();
 
-        let url = "/static/detail.html?beer=" + beer;
-        window.location.href = url;
+        var data = {
+            beer: beer,
+            quantity: 1
+        };
+
+        let settings = {
+            method : 'post',
+            headers : { 'Content-Type': 'application/json' },
+            body : JSON.stringify(data)
+        };
+
+        fetch("/api/tickets/buy", settings)
+            .then( response => {
+                if (response.ok || response.ticket) {
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
+            .then(responseJSON => {
+                window.location.href = "/static/receipt.html?r=" + responseJSON.ticket;
+            })
+            .catch(err => {
+                console.log(err);
+            })
     });
 
     $("#beerCatalog").on("click", "#beerBtnAdd", function(e) {
