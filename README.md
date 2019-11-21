@@ -20,5 +20,15 @@ This web page has 5 different pages:
 * **Receipt**
     * After you buy something, you see the receipt with your purchase details
 
+## Endpoints
+
+* **Beers**
+   * GET api/beers -> Gets all beers in the database
+   * POST api/beers -> Create a new beer in the databse
+   * PUT api/beers/:beer
+   * GET api/beers/ind/:id
+   * GET api/beers/:name
+   * DELETE api/beers/:id
+
 Heroku Production Link:
 https://intense-forest-79562.herokuapp.com
