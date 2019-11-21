@@ -184,6 +184,23 @@ function loadDetail() {
         })
 }
 
+function getEmail(userId, comment, rating) {
+    let url = '/api/users/' + userId;
+    fetch(url)
+        .then(res => {
+            if(res.ok) {
+                return res.json();
+            }
+            throw new Error(res.statusText);
+        })
+        .then(resJSON => {
+            postReview(comment, rating, resJSON.email);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 function getUser() {
     $("#logout").on("click", function(event) {
         event.preventDefault();
@@ -239,7 +256,7 @@ function getSession(comment, rating) {
             throw new Error(res.statusText);
         })
         .then(resJSON => {
-            getUser(resJSON.email, comment, rating);
+            getEmail(resJSON.email, comment, rating);
         })
         .catch(err => {
             console.log(err);
