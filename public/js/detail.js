@@ -157,7 +157,6 @@ function loadDetail() {
             }
 
             $("#beerName").text(resJSON.Nombre);
-            console.log(resJSON);
             $("#beerDetailImg").attr({"src": resJSON.fotoURL, "height":200, "width":160});
             $("#style").html(`<b>Style: </b> ${resJSON.Estilo}`);
             $("#brewery").html(`<b>Brewery: </b> ${resJSON.Cervecería}`);
@@ -231,6 +230,22 @@ function getUser() {
     });
 }
 
+function getSession(comment, rating) {
+    fetch("/api/session")
+        .then(res => {
+            if(res.ok) {
+                return res.json();
+            }
+            throw new Error(res.statusText);
+        })
+        .then(resJSON => {
+            getUser(resJSON.email, comment, rating);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 function init() {    
     loadDetail();
     getUser();
@@ -248,9 +263,7 @@ function init() {
         e.preventDefault();
         let comment = $("#reviewComment").val();
         let rating = $("#beerRating").val()/10;
-        let user = "test5@test.com";
-
-        postReview(comment, rating, user);
+        getSession(comment, rating);
     });
 
     $("#beerBtnAdd").on("click", function(e) {
