@@ -196,7 +196,7 @@ $(document).ready(function() {
                 if (response.ok || response.ticket) {
                     return response.json();
                 }
-                throw new Error(res.statusText);
+                throw new Error(response.statusText);
             })
             .then(responseJSON => {
                 fetch("api/cart/clear", {method: 'POST'})
