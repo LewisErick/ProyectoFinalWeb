@@ -35,17 +35,12 @@ app.use(session({
 
 app.get("/", (req, res, next) => {
 	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-	sess = req.session;
-	if (sess.email) {
-		res.sendFile("shop.html", {root: "public"});
-	} else {
-		res.sendFile("login.html", {root: "public"});
-	}
+	res.sendFile("shop.html", {root: "public"});
 })
 
-app.get("/shop", (req, res, next) => {
+app.get("/login", (req, res, next) => {
 	res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-	res.sendFile("shop.html", {root: "public"});
+	res.sendFile("login.html", {root: "public"});
 });
 
 app.get("/cart", (req, res, next) => {

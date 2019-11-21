@@ -21,7 +21,7 @@ function login(email, password) {
             throw new Error(res.statusText);
         })
         .then(resJSON => {
-            window.location.replace("/shop");
+            window.location.replace("/");
             console.log(resJSON);
         }) 
         .catch(err => {

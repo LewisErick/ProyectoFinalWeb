@@ -13,13 +13,13 @@ function getAllBeers() {
                 $("#beerCatalog").append(
                     `<div class="col-md-4">
                         <div class="row">
-                            <div class="col-md-12" id="selectBeer">
+                            <div class="col-md-12" id="selectBeer" style="cursor: pointer">
                                 <h4>
                                     ${resJSON[i].Nombre}
                                 </h4>
+                                <img alt="Bootstrap Image Preview" src=${resJSON[i].fotoURL} height="200" width=160"/>
                             </div>
                             <div class="col-md-12">
-                                <img alt="Bootstrap Image Preview" src=${resJSON[i].fotoURL} height="200" width=160"/>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h5>
@@ -124,7 +124,7 @@ function getUser() {
                 }
             });
         } else {
-            window.location.href = "/";
+            window.location.href = "/login";
         }
     });
 

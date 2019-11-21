@@ -12,7 +12,7 @@ function getUser() {
                 }
             });
         } else {
-            window.location.href = "/";
+            window.location.href = "/login";
         }
     });
 
@@ -88,7 +88,7 @@ function displayCartItems(items) {
                 if (ind == arr.length - 1) {
                     var total = 0;
                     for (var i = 0; i < Object.keys(totals).length; i+=1) {
-                        total += parseFloat(totals[i]);
+                        total += parseFloat(totals[Object.keys(totals)[i]]);
                     }
                     $("#globalTotal").html(
                         `Total: $${total}`
@@ -146,9 +146,11 @@ function retrieveCart() {
                                         delete totals[parseInt($(this).parent().parent().find(".ind").html())];
 
                                         var total = 0;
+                                        console.log(total);
                                         for (var i = 0; i < Object.keys(totals).length; i+=1) {
-                                            total += parseFloat(totals[i]);
+                                            total += parseFloat(totals[Object.keys(totals)[i]]);
                                         }
+                                        console.log(total);
                                         $("#globalTotal").html(
                                             `Total: $${total}`
                                         );
