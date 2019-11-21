@@ -271,7 +271,7 @@ app.post("/api/tickets/buy", jsonParser, (req, res, next) => {
 		});
 });
 
-app.post( "/api/tickets", jsonParser, ( req, res, next ) => {
+app.post( "/tickets", jsonParser, ( req, res, next ) => {
 	var newTicket = {};
 	var sess = req.session;
 	if (sess.email) {

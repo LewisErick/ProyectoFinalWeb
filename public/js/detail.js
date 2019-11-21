@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const beer = urlParams.get('beer');
 
-function addToShoppingCart(beerName) {
+function addToShoppingCart(beerName, amount) {
     console.log("1. " + beerName);
     fetch("/api/beers/" + beerName)
         .then(res => {
@@ -12,7 +12,8 @@ function addToShoppingCart(beerName) {
         })
         .then(beerResJSON => {
             var data = {
-                beerId: beerResJSON._id
+                beerId: beerResJSON._id,
+                quantity: amount
             }
             console.log(data);
             $.ajax({
@@ -296,7 +297,8 @@ function init() {
     });
 
     $("#beerBtnAdd").on("click", function(e) {
-        addToShoppingCart($("#beerName").text());
+        let amount = $("#cartAmount").val();
+        addToShoppingCart($("#beerName").text(), amount);
     });
 }
 
